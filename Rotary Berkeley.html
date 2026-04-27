@@ -1,0 +1,887 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Rotary — Berkeley Keynote</title>
+<script type="application/json" id="speaker-notes">[]</script>
+<style>
+  /* ============================================================
+     ROTARY × BERKELEY — CINEMATIC KEYNOTE
+     Apple keynote × Vogue editorial × Netflix doc
+     ============================================================ */
+  :root{
+    --black: #0A0A0A;
+    --ink:   #111;
+    --white: #F5F5F5;
+    --paper: #FAFAF7;
+    --gold:  #F7A81B;
+    --gold-deep: #C8861A;
+    --grey:  #8A8A8A;
+    --grey-2: #C8C8C8;
+    --grey-line: rgba(255,255,255,0.08);
+  }
+
+  html,body{ margin:0; padding:0; background:#000; }
+  body{
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: var(--ink);
+    overscroll-behavior:none;
+  }
+
+  deck-stage{ background:#000; }
+
+  /* ---------- SLIDE BASE ---------- */
+  section.slide{
+    width:100%; height:100%;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden; position:relative;
+    box-sizing:border-box;
+    font-feature-settings: "kern" 1, "liga" 1, "ss01" 1;
+    letter-spacing: -0.01em;
+  }
+  .light{ background: var(--white); color: var(--black); }
+  .dark { background: var(--black); color: var(--white); }
+  .paper{ background: var(--paper); color: var(--black); }
+
+  .gold{ color: var(--gold); }
+  .mute{ color: var(--grey); }
+  .thin{ font-weight: 200; }
+  .reg { font-weight: 400; }
+  .med { font-weight: 500; }
+  .bold{ font-weight: 700; }
+  .black-w{ font-weight: 900; }
+
+  .mono{
+    font-family: "SF Mono", "JetBrains Mono", "Courier New", monospace;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---------- EDITORIAL CHROME ---------- */
+  .chrome{
+    position:absolute; left:0; right:0;
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 44px 80px;
+    font-size: 18px; letter-spacing: 0.22em; text-transform: uppercase;
+  }
+  .chrome.top{ top:0; }
+  .chrome.bot{ bottom:0; }
+  .chrome .dot{
+    width:8px;height:8px;border-radius:50%; background: var(--gold); display:inline-block; vertical-align:middle; margin: 0 12px 3px;
+  }
+  .chrome .rule{
+    flex:1; height:1px; background: currentColor; opacity:0.18; margin: 0 24px;
+  }
+
+  /* ---------- TYPE SCALE (1920×1080) ---------- */
+  .display { font-size: 220px; font-weight: 800; line-height: 0.92; letter-spacing: -0.045em; }
+  .title-xl{ font-size: 150px; font-weight: 700; line-height: 0.96; letter-spacing: -0.035em; }
+  .title-l { font-size: 110px; font-weight: 600; line-height: 1.02; letter-spacing: -0.03em; }
+  .title-m { font-size:  84px; font-weight: 500; line-height: 1.08; letter-spacing: -0.02em; }
+  .title-s { font-size:  64px; font-weight: 500; line-height: 1.1;  letter-spacing: -0.015em; }
+  .body    { font-size:  34px; font-weight: 400; line-height: 1.4; }
+  .small   { font-size:  26px; font-weight: 400; line-height: 1.5; color: var(--grey); }
+  .tiny    { font-size:  18px; font-weight: 500; letter-spacing: 0.22em; text-transform: uppercase; }
+
+  /* ---------- LAYOUT HELPERS ---------- */
+  .stage{
+    width: 100%; height: 100%;
+    padding: 110px 120px;
+    box-sizing: border-box;
+    display: flex; flex-direction: column;
+    position: relative;
+  }
+  .center-stack{ justify-content:center; align-items:flex-start; }
+  .center-all  { justify-content:center; align-items:center; text-align:center; }
+  .between     { justify-content:space-between; }
+
+  .grid-2 { display:grid; grid-template-columns: 1fr 1fr; height:100%; width:100%; }
+  .grid-3 { display:grid; grid-template-columns: repeat(3, 1fr); }
+  .gap-l  { gap: 80px; }
+  .gap-m  { gap: 48px; }
+  .gap-s  { gap: 24px; }
+
+  .pad{ padding: 110px 120px; }
+  .pad-s{ padding: 70px 90px; }
+
+  /* ---------- ENTRY ANIMATIONS ---------- */
+  /* Each slide animates only when active (deck-stage adds an attribute via aria/visibility) */
+  /* We'll animate by listening to slideIndexChanged */
+  .anim{ opacity: 0; transform: translateY(28px); transition: opacity 1100ms cubic-bezier(.2,.7,.2,1), transform 1100ms cubic-bezier(.2,.7,.2,1); }
+  .anim.in{ opacity: 1; transform: translateY(0); }
+  .anim.d1{ transition-delay: 120ms; }
+  .anim.d2{ transition-delay: 280ms; }
+  .anim.d3{ transition-delay: 460ms; }
+  .anim.d4{ transition-delay: 640ms; }
+  .anim.d5{ transition-delay: 820ms; }
+
+  .reveal-line{
+    display:inline-block; overflow:hidden; vertical-align: bottom;
+  }
+  .reveal-line > span{
+    display:inline-block; transform: translateY(110%); transition: transform 1200ms cubic-bezier(.2,.7,.2,1);
+  }
+  .in .reveal-line > span{ transform: translateY(0); }
+  .reveal-line.d1 > span{ transition-delay: 120ms; }
+  .reveal-line.d2 > span{ transition-delay: 280ms; }
+  .reveal-line.d3 > span{ transition-delay: 440ms; }
+  .reveal-line.d4 > span{ transition-delay: 600ms; }
+
+  /* ---------- DOCUMENTARY IMAGE FRAMES ---------- */
+  .photo{
+    position:relative; width:100%; height:100%; overflow:hidden;
+    background: #0a0a0a;
+  }
+  .photo .img{
+    position:absolute; inset:0;
+    background-size: cover; background-position: center;
+    filter: contrast(1.05) saturate(0.92) brightness(0.92);
+  }
+  .photo::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.0) 40%, rgba(0,0,0,0.55) 100%);
+    pointer-events:none;
+  }
+  .photo .label{
+    position:absolute; top:24px; left:24px; z-index:2;
+    font-family: "SF Mono", "JetBrains Mono", monospace;
+    font-size: 14px; letter-spacing: 0.2em; text-transform:uppercase;
+    color: rgba(255,255,255,0.55);
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 8px 12px; border-radius: 2px;
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(4px);
+  }
+
+  /* SLIDE 3 split */
+  .photo.abundance::before{
+    background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.04) 0 2px, transparent 2px 22px),
+      radial-gradient(ellipse at 60% 40%, #3a2f1a 0%, #1a1308 70%);
+  }
+  .photo.scarcity::before{
+    background:
+      repeating-linear-gradient(135deg, rgba(255,255,255,0.03) 0 2px, transparent 2px 28px),
+      radial-gradient(ellipse at 40% 60%, #2a2a2a 0%, #060606 70%);
+  }
+
+  /* ---------- DECORATIVE LINES ---------- */
+  .hairline{ height:1px; background: currentColor; opacity:0.14; }
+  .hairline.gold{ background: var(--gold); opacity: 1; }
+
+  /* ---------- INTERACTIVE: 2 HOURS CLOCK ---------- */
+  .clock-wrap{
+    width: 720px; height: 720px; position:relative;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .clock-ring{
+    position:absolute; inset:0; border-radius:50%;
+    border: 1px solid rgba(255,255,255,0.18);
+  }
+  .clock-ring.outer{ inset: 0; }
+  .clock-ring.inner{ inset: 60px; border-color: rgba(255,255,255,0.10); }
+  .clock-svg{ position:absolute; inset:0; width:100%; height:100%; }
+  .clock-num{
+    position:absolute; font-size: 320px; font-weight: 800; letter-spacing: -0.05em;
+    line-height:1; color: var(--gold);
+    text-shadow: 0 0 80px rgba(247,168,27,0.25);
+  }
+  .clock-tick{
+    position:absolute; left:50%; top:8px;
+    width:1px; height:18px; background: rgba(255,255,255,0.4);
+    transform-origin: 50% 352px;
+  }
+  .clock-tick.major{ height: 28px; background: rgba(255,255,255,0.7); }
+  .clock-tick.gold { background: var(--gold); height: 36px; width:2px; }
+
+  /* QR placeholder */
+  .qr{
+    width: 360px; height: 360px;
+    background: var(--black);
+    color: var(--white);
+    display:grid; grid-template-columns: repeat(21, 1fr); grid-template-rows: repeat(21, 1fr);
+    padding: 18px; box-sizing: border-box;
+    border-radius: 14px;
+  }
+  .qr i{ background: var(--white); }
+  .qr i.b{ background: transparent; }
+
+  /* ---------- SLIDE 17 GLOW ---------- */
+  .glow-stage{
+    position:absolute; inset:0;
+    background: radial-gradient(ellipse at 50% 65%, rgba(247,168,27,0.20) 0%, rgba(247,168,27,0.08) 22%, rgba(0,0,0,0) 55%);
+    pointer-events:none;
+  }
+  .glow-text{
+    text-shadow: 0 0 60px rgba(247,168,27,0.35), 0 0 140px rgba(247,168,27,0.15);
+  }
+
+  /* ---------- BIG NUMBER (slide 4) ---------- */
+  .mega-number{
+    font-size: 520px; font-weight: 800; line-height: 0.85;
+    letter-spacing: -0.06em;
+    background: linear-gradient(180deg, #fff 0%, #fff 60%, rgba(255,255,255,0.55) 100%);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+
+  /* ---------- SLIDE 9 — VERTICAL FIGURES ---------- */
+  .stat-row{
+    display:flex; align-items: baseline; gap: 36px;
+    border-top: 1px solid rgba(255,255,255,0.14);
+    padding: 28px 0;
+  }
+  .stat-row:last-child{ border-bottom: 1px solid rgba(255,255,255,0.14); }
+  .stat-num{ font-size: 110px; font-weight: 700; color: var(--gold); letter-spacing: -0.03em; line-height:1; min-width: 320px; }
+  .stat-lbl{ font-size: 30px; color: #d8d8d8; font-weight: 400; }
+
+  /* ---------- SLIDE 12 GRID ---------- */
+  .rotary-grid{
+    display:grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2,1fr);
+    gap: 0;
+    border-top: 1px solid rgba(0,0,0,0.12);
+    border-left: 1px solid rgba(0,0,0,0.12);
+  }
+  .rotary-cell{
+    border-right: 1px solid rgba(0,0,0,0.12);
+    border-bottom: 1px solid rgba(0,0,0,0.12);
+    padding: 56px 60px;
+    display:flex; flex-direction:column; justify-content:space-between;
+    min-height: 280px;
+  }
+  .rotary-num{ font-size: 110px; font-weight: 700; color: var(--gold); letter-spacing: -0.03em; line-height:1; }
+  .rotary-lbl{ font-size: 24px; color: #444; letter-spacing: 0.06em; text-transform: uppercase; font-weight:500; }
+
+  /* ---------- SLIDE 15 SPLIT ---------- */
+  .choice-half{
+    height:100%; padding: 110px 100px;
+    display:flex; flex-direction:column; justify-content:center;
+    position:relative;
+    transition: background 600ms ease;
+    cursor: default;
+  }
+  .choice-half.left { background: var(--white); color: var(--ink); }
+  .choice-half.right{ background: var(--black); color: var(--white); }
+  .choice-half .word{ font-size: 180px; font-weight: 800; letter-spacing:-0.04em; line-height:1; }
+  .choice-half.right .word{ color: var(--gold); }
+  .choice-half:hover .word{ transform: translateX(8px); }
+  .choice-half .word{ transition: transform 700ms cubic-bezier(.2,.7,.2,1); }
+
+  /* ---------- HORIZONTAL CASCADE (slide 6) ---------- */
+  .cascade > div{ padding-left: 0; }
+  .cascade > div:nth-child(2){ padding-left: 80px; }
+  .cascade > div:nth-child(3){ padding-left: 160px; }
+  .cascade > div:nth-child(4){ padding-left: 240px; }
+
+  /* ---------- SECTION INDEX (top right) ---------- */
+  .idx{ font-family: "SF Mono", monospace; font-size:18px; letter-spacing:0.2em; }
+
+  /* ---------- SLIDE 1 specific ---------- */
+  .ate-token{
+    display:inline-block; position:relative;
+  }
+  .ate-token::after{
+    content:""; position:absolute; left:-4px; right:-4px; bottom: 8px; height: 22px;
+    background: var(--gold); opacity:0.22; z-index:-1;
+    transform: scaleX(0); transform-origin: left;
+    transition: transform 900ms cubic-bezier(.2,.7,.2,1) 600ms;
+  }
+  .in .ate-token::after{ transform: scaleX(1); }
+
+  /* utility */
+  .full{ width:100%; height:100%; }
+  .abs{ position:absolute; }
+  .rel{ position:relative; }
+  .nowrap{ white-space:nowrap; }
+  .upper{ text-transform: uppercase; letter-spacing: 0.22em; }
+
+  /* hide chrome on print */
+  @media print{
+    .chrome{ display:none; }
+  }
+
+</style>
+</head>
+<body>
+
+<deck-stage width="1920" height="1080">
+
+  <!-- ============ SLIDE 1 — HOOK ============ -->
+  <section class="slide light" data-label="01 Hook">
+    <div class="chrome top mute">
+      <div><span class="mono">ROTARY</span> <span class="dot"></span> <span class="mono">UC&nbsp;BERKELEY</span></div>
+      <div class="rule"></div>
+      <div class="mono idx">01 / 17</div>
+    </div>
+
+    <div class="stage center-stack" style="padding-left:160px;">
+      <div class="tiny mute anim d1">— Chapter One · A simple question</div>
+      <div style="height:48px"></div>
+      <h1 class="title-xl anim d2" style="max-width: 1500px;">
+        Who here <span class="ate-token gold">ate</span> today?
+      </h1>
+      <div style="height:64px"></div>
+      <div class="anim d4" style="display:flex; align-items:center; gap:24px;">
+        <div style="width:48px;height:1px;background:#000;opacity:0.5;"></div>
+        <div class="body mute" style="font-style: italic;">Be honest.</div>
+      </div>
+    </div>
+
+    <div class="chrome bot mute">
+      <div class="mono">
+</div>
+      <div class="rule"></div>
+      <div class="mono">2026</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 2 — TENSION ============ -->
+  <section class="slide dark" data-label="02 Tension">
+    <div class="chrome top mute">
+      <div><span class="mono">ROTARY</span> <span class="dot"></span> <span class="mono">UC&nbsp;BERKELEY</span></div>
+      <div class="rule"></div>
+      <div class="mono idx">02 / 17</div>
+    </div>
+
+    <div class="stage center-stack" style="padding-left:160px;">
+      <div class="tiny anim d1" style="color:#666;">— A harder one</div>
+      <div style="height:48px"></div>
+      <h2 class="title-xl anim d2" style="max-width: 1500px;">
+        Who here <span class="gold">helped</span> someone<br/>eat today?
+      </h2>
+      <div style="height:64px"></div>
+      <div class="anim d4" style="display:flex; align-items:center; gap:24px;">
+        <div style="width:48px;height:1px;background:#fff;opacity:0.4;"></div>
+        <div class="body" style="color:#bdbdbd; font-style: italic;">Not thought about it. Actually did something.</div>
+      </div>
+    </div>
+
+    <div class="chrome bot" style="color:#555;">
+      <div class="mono">
+</div>
+      <div class="rule"></div>
+      <div class="mono">02</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3 — VISUAL SHOCK (typographic) ============ -->
+  <section class="slide dark" data-label="03 Visual Shock">
+    <div class="stage center-all">
+      <div class="title-xl anim d1" style="font-weight:300;">Same world.</div>
+      <div style="height:40px"></div>
+      <div class="title-xl anim d3 gold" style="font-weight:700;">Different plates.</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 4 — LOGOS / NUMBER ============ -->
+  <section class="slide dark" data-label="04 Logos">
+
+
+    <div class="stage" style="padding: 120px 120px; display:grid; grid-template-columns: 1.2fr 1fr; align-items:center; gap: 80px;">
+      <div>
+        <div class="tiny anim d1" style="color:#777;">Global hunger · 2026</div>
+        <div style="height:24px"></div>
+        <div class="mega-number anim d2">735<span class="gold" style="font-size:0.4em; vertical-align: super; -webkit-text-fill-color: var(--gold);">M</span></div>
+        <div style="height:32px"></div>
+        <div class="title-s anim d3" style="font-weight:300; color:#ddd;">people are hungry.</div>
+        <div style="height:18px"></div>
+        <div class="body anim d4 mono" style="color:#999;">≈ 1 in 10 humans</div>
+      </div>
+
+      <div class="anim d4" style="border-left: 1px solid rgba(255,255,255,0.18); padding-left: 60px;">
+        <div class="tiny" style="color: var(--gold);">
+</div>
+        <div style="height:32px"></div>
+        <div class="title-m thin">This is not<br/>a crisis.</div>
+        <div style="height:24px"></div>
+        <div class="title-m bold gold">It’s a system.</div>
+      </div>
+    </div>
+
+    <div class="chrome bot" style="color:#555;">
+      <div class="mono">SOURCE · UN FAO · STATE OF FOOD SECURITY 2024</div>
+      <div class="rule"></div>
+      <div class="mono">04</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 — REFRAME ============ -->
+  <section class="slide light" data-label="05 Reframe">
+
+
+    <div class="stage" style="display:grid; grid-template-columns: 1fr; align-items:center;">
+      <div style="max-width: 1500px;">
+        <div class="title-l anim d1" style="font-weight:300;">Food is not just<br/>what you eat.</div>
+        <div style="height:48px"></div>
+        <div class="title-l anim d3" style="padding-left: 320px; font-weight:700;">It’s what the world 
+<span class="gold">allows</span> you to eat.
+</div>
+      </div>
+    </div>
+
+    <div class="abs anim d2" style="right: 120px; top: 220px; width: 220px; opacity:0.9;">
+      <div class="hairline gold" style="height:2px;"></div>
+      <div class="mono small" style="color: var(--gold-deep); margin-top:14px; font-size:14px; letter-spacing:0.2em;">
+</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6 — BELIEF BREAK ============ -->
+  <section class="slide dark" data-label="06 Belief">
+
+
+    <div class="stage center-stack cascade" style="gap: 28px; padding-left: 200px;">
+      <div class="title-l anim d1" style="font-weight: 300;">You think impact</div>
+      <div class="title-l anim d2" style="font-weight: 300;">comes <span class="gold">later</span>.</div>
+
+      <div style="height: 40px"></div>
+
+      <div class="body anim d3" style="color:#9c9c9c;">After graduation.</div>
+      <div class="body anim d4" style="color:#7a7a7a;">After money.</div>
+      <div class="body anim d5" style="color:#5a5a5a;">After success.</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7 — TURN ============ -->
+  <section class="slide light" data-label="07 Turn">
+
+
+    <div class="stage center-all">
+      <div class="title-xl anim d1" style="text-align:left; max-width:1500px;">
+        I thought that too.
+      </div>
+      <div style="height:36px"></div>
+      <div class="title-xl anim d3" style="text-align:left; max-width:1500px;">
+        I was <span class="gold">wrong</span>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8 — ETHOS 1 ============ -->
+  <section class="slide dark" data-label="08 Ethos 1">
+    <div class="abs full">
+      <div class="photo">
+        <div class="img" style="background-image:url('assets/slide8-press.jpg'); background-position: 60% center;"></div>
+      </div>
+    </div>
+
+    <div class="abs full" style="background: linear-gradient(90deg, rgba(0,0,0,0.86) 0%, rgba(0,0,0,0.55) 45%, rgba(0,0,0,0.05) 100%);"></div>
+
+    <div class="stage" style="position:relative; justify-content:center; align-items:flex-start; padding-left: 140px;">
+      <div class="tiny anim d1" style="color: var(--gold);">
+</div>
+      <div style="height:32px"></div>
+      <h2 class="title-xl anim d2" style="color:#fff; max-width: 1100px;">
+        I joined<br/><span class="gold">Rotary</span>.
+      </h2>
+      <div style="height:40px"></div>
+      <div class="body anim d4" style="color:#cfcfcf; font-style: italic; max-width:760px;">
+        Not knowing what it would become.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9 — ETHOS 2 (triptych + numbers) ============ -->
+  <section class="slide dark" data-label="09 Ethos 2">
+    <div class="full" style="display:grid; grid-template-columns: 1.05fr 1fr; height:100%;">
+      <!-- LEFT: 3-image triptych -->
+      <div style="display:grid; grid-template-rows: 1.15fr 1fr; gap:6px; padding:6px 0 6px 6px; background:#0a0a0a;">
+        <div class="photo">
+          <div class="img" style="background-image:url('assets/slide9-un.jpg'); background-position: center;"></div>
+          <div style="position:absolute; left:18px; bottom:14px; z-index:3; font-family:'SF Mono',monospace; font-size:13px; letter-spacing:0.18em; color:rgba(255,255,255,0.8); text-transform:uppercase;">UN · General Assembly</div>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+          <div class="photo">
+            <div class="img" style="background-image:url('assets/slide9-aid.jpg'); background-position: center;"></div>
+            <div style="position:absolute; left:14px; bottom:12px; z-index:3; font-family:'SF Mono',monospace; font-size:11px; letter-spacing:0.18em; color:rgba(255,255,255,0.8); text-transform:uppercase;">Field · Aid</div>
+          </div>
+          <div class="photo">
+            <div class="img" style="background-image:url('assets/slide8-press.jpg'); background-position: center;"></div>
+            <div style="position:absolute; left:14px; bottom:12px; z-index:3; font-family:'SF Mono',monospace; font-size:11px; letter-spacing:0.18em; color:rgba(255,255,255,0.8); text-transform:uppercase;">Press · 2M</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: numbers -->
+      <div style="padding: 120px 100px; display:flex; flex-direction:column; justify-content:center; background: #0a0a0a;">
+        <div class="tiny anim d1" style="color: var(--gold);">— BEFORE GRADUATING</div>
+        <div style="height: 40px"></div>
+
+        <div class="anim d2 in">
+          <div class="stat-row"><div class="stat-num">27 </div><div class="stat-lbl">Projects as a President</div></div>
+        </div>
+        <div class="anim d3 in">
+          <div class="stat-row"><div class="stat-num">35k</div><div class="stat-lbl">people impacted</div></div>
+        </div>
+        <div class="anim d4 in">
+          <div class="stat-row"><div class="stat-num">500+</div><div class="stat-lbl">people mobilized</div></div>
+        </div>
+
+        <div style="height: 40px"></div>
+        <div class="body anim d5" style="color:#9d9d9d; font-style: italic;">All before graduating High School.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10 — ETHOS 3 (impact, school + inauguration) ============ -->
+  <section class="slide dark" data-label="10 Impact">
+    <div class="full" style="display:grid; grid-template-columns: 1fr 1fr; height:100%;">
+      <div class="photo">
+        <div class="img" style="background-image:url('assets/slide10-school.jpg'); background-position: center;"></div>
+        <div style="position:absolute; left:24px; bottom:20px; z-index:3; font-family:'SF Mono',monospace; font-size:13px; letter-spacing:0.18em; color:rgba(255,255,255,0.85); text-transform:uppercase;">The school · rebuilt</div>
+      </div>
+      <div class="photo">
+        <div class="img" style="background-image:url('assets/slide10-ribbon.jpg'); background-position: center 30%;"></div>
+        <div style="position:absolute; left:24px; bottom:20px; z-index:3; font-family:'SF Mono',monospace; font-size:13px; letter-spacing:0.18em; color:rgba(255,255,255,0.85); text-transform:uppercase;">Inauguration · 11 June 2024</div>
+      </div>
+    </div>
+
+    <!-- Bottom dark band with stats -->
+    <div class="abs" style="left:0; right:0; bottom:0; padding: 60px 120px 70px; background: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.85) 30%, rgba(0,0,0,0.97) 100%);">
+      <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap: 60px; align-items:end;">
+        <div class="anim d1">
+          <div class="tiny" style="color: var(--gold);">RAISED</div>
+          <div style="height:14px"></div>
+          <div class="title-l" style="color:#fff; font-weight:700;">$250<span class="gold">K</span></div>
+        </div>
+        <div class="anim d2">
+          <div class="tiny" style="color: var(--gold);">REBUILT</div>
+          <div style="height:14px"></div>
+          <div class="title-l" style="color:#fff; font-weight:700;">1<span class="thin" style="font-size:0.4em; color:#bbb; padding-left:14px;">school</span></div>
+        </div>
+        <div class="anim d3">
+          <div class="tiny" style="color: var(--gold);">RETURNED</div>
+          <div style="height:14px"></div>
+          <div class="title-l" style="color:#fff; font-weight:700;">100<span class="thin" style="font-size:0.4em; color:#bbb; padding-left:14px;">students</span></div>
+        </div>
+      </div>
+      <div style="height:24px"></div>
+      <div class="anim d4 body" style="color:#cfcfcf; font-style:italic;">After an earthquake.</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 11 — PIVOT ============ -->
+  <section class="slide dark" data-label="11 Pivot">
+
+
+    <div class="stage center-all">
+      <div class="title-xl anim d1" style="font-weight:300;">This wasn’t luck.</div>
+      <div style="height:40px"></div>
+      <div class="title-xl anim d3">It was <span class="gold bold">structure</span>.</div>
+    </div>
+
+    <div class="abs" style="left:50%; bottom: 120px; transform: translateX(-50%); display:flex; gap: 18px;">
+      <div class="hairline gold" style="width: 64px; height:2px;"></div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 12 — ROTARY ============ -->
+  <section class="slide light" data-label="12 Rotary">
+
+
+    <div class="stage" style="padding: 100px 120px;">
+      <div style="display:grid; grid-template-columns: 1fr 1.4fr; gap: 80px; align-items:start;">
+        <div>
+          <div class="anim d1" style="display:flex; align-items:center; gap:18px; margin-bottom:32px;">
+            <img src="assets/rotary-logo.png" alt="Rotary International" style="height:72px; width:auto; display:block;" />
+          </div>
+          <div class="tiny mute anim d1">— Established 1905</div>
+          <div style="height:24px"></div>
+          <div class="title-xl anim d2" style="line-height:0.95;">This is<br/><span class="gold">Rotary</span>.</div>
+          <div style="height:32px"></div>
+          <div class="hairline gold anim d3 in" style="width:80px;height:2px;"></div>
+          <div style="height:24px"></div>
+          <div class="body anim d3" style="max-width:380px; color:#333;">Local action.<br/>Global scale.</div>
+        </div>
+
+        <div class="rotary-grid anim d4 in">
+          <div class="rotary-cell">
+            <div class="rotary-num">1.4M</div>
+            <div class="rotary-lbl">Members</div>
+          </div>
+          <div class="rotary-cell">
+            <div class="rotary-num">200+</div>
+            <div class="rotary-lbl">Countries</div>
+          </div>
+          <div class="rotary-cell">
+            <div class="rotary-num">$4B+</div>
+            <div class="rotary-lbl">Invested in impact</div>
+          </div>
+          <div class="rotary-cell">
+            <div class="rotary-num">~15</div>
+            <div class="rotary-lbl">Polio cases — near eradication</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chrome bot mute">
+      <div class="mono">SOURCE · ROTARY INTERNATIONAL</div>
+      <div class="rule"></div>
+      <div class="mono">12</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13 — INTERACTIVE 2 HOURS ============ -->
+  <section class="slide dark" data-label="13 Interactive">
+
+
+    <div class="stage" style="display:grid; grid-template-columns: 1fr 1fr; align-items:center; gap: 80px; padding: 120px 120px;">
+
+      <div class="rel" style="display:flex; align-items:center; justify-content:center;">
+        <div class="clock-wrap anim d1">
+          <div class="clock-ring outer"></div>
+          <div class="clock-ring inner"></div>
+          <svg class="clock-svg" viewBox="0 0 720 720" id="clockSvg">
+            <!-- 12 ticks -->
+          </svg>
+          <div class="clock-num">2<span style="font-size:0.32em; font-weight:300; color:#fff; letter-spacing:0.04em; padding-left:14px;">hr</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="tiny anim d1" style="color: var(--gold);">— THIS WEEK</div>
+        <div style="height:24px"></div>
+        <div class="title-l anim d2">You have<br/><span class="gold">2 hours</span><br/>this week.</div>
+        <div style="height:48px"></div>
+        <div class="hairline anim d3 in" style="background:#444;"></div>
+        <div style="height:32px"></div>
+        <div class="body anim d3" style="color:#dcdcdc;">Turn to someone.</div>
+        <div class="body anim d4" style="color:#dcdcdc;">Decide how to use them.</div>
+      </div>
+    </div>
+
+    <div class="chrome bot" style="color:#444;">
+      <div class="mono">
+</div>
+      <div class="rule"></div>
+      <div class="mono">13</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 14 — MIRROR ============ -->
+  <section class="slide light" data-label="14 Mirror">
+
+
+    <div class="stage center-stack" style="padding-left: 160px;">
+      <div class="title-l anim d1" style="font-weight: 300; max-width:1500px;">
+        Berkeley students are <span class="bold">aware</span>.
+      </div>
+      <div style="height: 40px"></div>
+      <div class="title-l anim d3" style="font-weight: 300; max-width:1500px;">
+        But awareness without action<br/>changes <span class="gold bold">nothing</span>.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 15 — CHOICE ============ -->
+  <section class="slide" data-label="15 Choice">
+    <div class="grid-2 full">
+      <div class="choice-half left anim d1 in">
+        <div class="tiny mute">— OPTION A</div>
+        <div style="height: 24px"></div>
+        <div class="word">Stay.</div>
+        <div style="height: 24px"></div>
+        <div class="body" style="color:#666;">Aware. Comfortable. Quiet.</div>
+      </div>
+      <div class="choice-half right anim d3 in">
+        <div class="tiny" style="color:#888;">— OPTION B</div>
+        <div style="height: 24px"></div>
+        <div class="word">Act.</div>
+        <div style="height: 24px"></div>
+        <div class="body" style="color:#bdbdbd;">One meeting. One project. One impact.</div>
+      </div>
+    </div>
+
+    <div class="abs" style="left:50%; top:50%; transform: translate(-50%,-50%); z-index:3;">
+      <div style="width:110px; height:110px; border-radius:50%; background: var(--gold); display:flex; align-items:center; justify-content:center; box-shadow: 0 0 60px rgba(247,168,27,0.45);">
+        <div class="mono" style="font-size:22px; font-weight:700; color:#0A0A0A; letter-spacing:0.1em;">OR</div>
+      </div>
+    </div>
+
+
+  </section>
+
+  <!-- ============ SLIDE 16 — CALL TO ACTION ============ -->
+  <section class="slide light" data-label="16 CTA">
+
+
+    <div class="stage" style="display:grid; grid-template-columns: 1.3fr 1fr; align-items:center; gap: 100px;">
+      <div>
+        <div class="tiny mute anim d1">— THREE WORDS</div>
+        <div style="height: 28px"></div>
+        <div class="display anim d2" style="font-size: 200px;">
+          Join.<br/>
+          <span class="gold">Start.</span><br/>
+          Build.
+        </div>
+        <div style="height: 56px"></div>
+        <div class="hairline anim d3 in" style="background:#000;width:120px;height:2px;"></div>
+        <div style="height: 24px"></div>
+        <div class="body anim d3" style="color:#444; max-width:680px;">
+          One meeting. One project. One impact.
+        </div>
+      </div>
+
+      <div class="anim d4" style="display:flex; flex-direction:column; align-items:center;">
+        <div style="width:380px; height:380px; padding:20px; background:#fff; border-radius:14px; box-shadow: 0 30px 80px -30px rgba(0,0,0,0.25), 0 0 0 1px rgba(0,0,0,0.06);">
+          <img src="assets/qrcode.jpg" alt="QR — Berkeley Rotary" style="width:100%; height:100%; object-fit:contain; display:block;" />
+        </div>
+        <div style="height:28px"></div>
+        <div class="mono small" style="color:#222; letter-spacing:0.2em; font-size:18px;">SCAN · JOIN ROTARY</div>
+        <div class="mono" style="color:#888; font-size:14px; letter-spacing:0.2em; margin-top:8px;">https://berkeleyrotary.org/
+</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 17 — FINAL ============ -->
+  <section class="slide dark" data-label="17 Final">
+    <div class="glow-stage"></div>
+
+
+
+    <div class="stage center-all">
+      <div class="title-xl anim d1 glow-text" style="font-weight: 300;">
+        Impact is not <span class="gold">later</span>.
+      </div>
+      <div style="height: 56px"></div>
+      <div class="display anim d3 glow-text" style="font-size: 280px;">
+        It’s <span class="gold">now</span>.
+      </div>
+    </div>
+
+    <div class="chrome bot" style="color:#444;">
+      <div class="mono">THANK YOU</div>
+      <div class="rule"></div>
+      <div class="mono">ROTARACT · UC BERKELEY</div>
+    </div>
+  </section>
+
+</deck-stage>
+
+<script src="deck-stage.js"></script>
+<script>
+  /* ---------- ENTRY ANIMATION HOOK ----------
+     deck-stage posts {slideIndexChanged: N} on init + every change.
+     We add `.in` to descendants of the active slide so .anim transitions trigger.
+  */
+  (function(){
+    const stage = document.querySelector('deck-stage');
+    const slides = stage.querySelectorAll('section.slide');
+
+    function activate(idx){
+      slides.forEach((s, i) => {
+        const els = s.querySelectorAll('.anim, .reveal-line');
+        if (i === idx){
+          // restart by removing then re-adding next frame
+          els.forEach(el => el.classList.remove('in'));
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              els.forEach(el => el.classList.add('in'));
+            });
+          });
+        } else {
+          els.forEach(el => el.classList.remove('in'));
+        }
+      });
+    }
+
+    // Listen to messages from deck-stage (it postMessages to parent; we listen on window too)
+    window.addEventListener('message', (e) => {
+      const d = e.data;
+      if (d && typeof d.slideIndexChanged === 'number'){
+        activate(d.slideIndexChanged);
+      }
+    });
+
+    // Fallback: also poll the stage for current index occasionally
+    let last = -1;
+    function tick(){
+      // deck-stage uses URL hash for index (e.g. #/3). Read it.
+      const m = location.hash.match(/(\d+)/);
+      const idx = m ? parseInt(m[1],10) : 0;
+      if (idx !== last){
+        last = idx;
+        activate(idx);
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // Activate first on load
+    setTimeout(() => activate(0), 80);
+  })();
+
+  /* ---------- CLOCK TICKS ---------- */
+  (function(){
+    const svg = document.getElementById('clockSvg');
+    if (!svg) return;
+    const cx = 360, cy = 360;
+    const ns = 'http://www.w3.org/2000/svg';
+    for (let i = 0; i < 60; i++){
+      const angle = (i / 60) * Math.PI * 2 - Math.PI / 2;
+      const isMajor = i % 5 === 0;
+      const isGold = i === 0 || i === 10; // 12 and 2 o'clock (2 hour mark)
+      const r1 = isMajor ? 340 : 348;
+      const r2 = 354;
+      const x1 = cx + Math.cos(angle) * r1;
+      const y1 = cy + Math.sin(angle) * r1;
+      const x2 = cx + Math.cos(angle) * r2;
+      const y2 = cy + Math.sin(angle) * r2;
+      const line = document.createElementNS(ns, 'line');
+      line.setAttribute('x1', x1); line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2); line.setAttribute('y2', y2);
+      line.setAttribute('stroke', isGold ? '#F7A81B' : (isMajor ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.25)'));
+      line.setAttribute('stroke-width', isGold ? 3 : (isMajor ? 1.5 : 1));
+      svg.appendChild(line);
+    }
+    // 2-hour arc highlight (from 12 to 2 o'clock)
+    const arc = document.createElementNS(ns, 'path');
+    const start = { x: cx, y: cy - 354 };
+    const end = { x: cx + Math.cos(-Math.PI/2 + (10/60)*Math.PI*2) * 354, y: cy + Math.sin(-Math.PI/2 + (10/60)*Math.PI*2) * 354 };
+    arc.setAttribute('d', `M ${start.x} ${start.y} A 354 354 0 0 1 ${end.x} ${end.y}`);
+    arc.setAttribute('fill', 'none');
+    arc.setAttribute('stroke', '#F7A81B');
+    arc.setAttribute('stroke-width', '4');
+    arc.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(arc);
+  })();
+
+  /* ---------- QR CODE PLACEHOLDER (decorative) ---------- */
+  (function(){
+    const grid = document.getElementById('qrGrid');
+    if (!grid) return;
+    const N = 21;
+    // Pseudo-random but stable pattern
+    const seed = 137;
+    function rand(i){ return ((i * 9301 + 49297 + seed * 233) % 233280) / 233280; }
+    const cells = [];
+    for (let y = 0; y < N; y++){
+      for (let x = 0; x < N; x++){
+        const i = y*N+x;
+        const isFinder =
+          (x < 7 && y < 7) ||
+          (x >= N-7 && y < 7) ||
+          (x < 7 && y >= N-7);
+        let on;
+        if (isFinder){
+          // finder pattern
+          const lx = x < 7 ? x : (x >= N-7 ? x - (N-7) : 0);
+          const ly = y < 7 ? y : (y >= N-7 ? y - (N-7) : 0);
+          const inOuter = lx===0||lx===6||ly===0||ly===6;
+          const inInner = lx>=2&&lx<=4&&ly>=2&&ly<=4;
+          on = inOuter || inInner;
+        } else {
+          on = rand(i) > 0.52;
+        }
+        cells.push(on);
+      }
+    }
+    grid.innerHTML = cells.map(on => `<i class="${on?'':'b'}"></i>`).join('');
+  })();
+</script>
+
+</body>
+</html>
